@@ -34,6 +34,7 @@ import pandas as pd
 import string
 import time
 import xarray as xr
+from memory_profiler import profile
 
 from ._geoprocessing import analyze_filename_dem, \
                             classify_aspect, \
@@ -154,7 +155,7 @@ def define_landform_classes(step, limit, TYPE='SIMPLE'):
 
     return (lf_full_set, ele_breaks)
 
-
+@profile
 def tiles_already_processed(TILESTORE_PATH):
     """Check if the tile exists."""
     existing_tiles = glob.glob(os.path.join(TILESTORE_PATH, '*.nc'))
@@ -170,7 +171,7 @@ def tiles_already_processed(TILESTORE_PATH):
                 log.warn('Source attr not set in file %s.' % existing_tile)
     return processed_tiles
 
-
+@profile
 def match_watermask_shpfile(glob_string):
     """Check if the generated shp glob_string exists."""
     found=False
@@ -195,7 +196,7 @@ def match_watermask_shpfile(glob_string):
             exit()
     return shp
 
-
+@profile
 def get_tile_summary(ds, cutoff=0):
     """Compute the fractional cover of the landforms in this tile."""
 
@@ -295,7 +296,7 @@ def create_stats_table(df, var):
                     [x for x in df_.columns.tolist() if x not in latloncnt_cols]
     return df_[new_col_order]
 
-
+@profile
 @time_dec
 def convert_dem_files(cfg, lf_ele_levels):
     """Compute landform units based on elevation, slope, aspect and tpi classes."""
@@ -356,7 +357,7 @@ def convert_dem_files(cfg, lf_ele_levels):
                     else:
                         log.debug("Empty tile %d in file %s ignored." % (i+1, dem_file))
 
-
+@profile
 @time_dec
 def compute_statistics(cfg):
     """Extract landform statistics from tiles in tilestore."""
@@ -512,7 +513,7 @@ def build_site_netcdf(soilref, elevref, extent=None):
     dsout[da.name] = da
     return dsout
 
-
+@profile
 @time_dec
 def build_landform_netcdf(lf_full_set, df_dict, cfg, elevation_levels, refnc=None):
     """Build landform netcdf based on refnc dims and datatables."""
