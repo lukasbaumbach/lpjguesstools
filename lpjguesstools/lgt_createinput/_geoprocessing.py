@@ -11,7 +11,7 @@ from rasterio.enums import Resampling
 from rasterio.mask import mask
 import scipy
 import xarray as xr
-from memory_profiler import profile
+#from memory_profiler import profile
 
 from ._tpi import calculate_tpi
 from ._xr_tile import *
