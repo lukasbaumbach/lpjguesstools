@@ -34,7 +34,7 @@ import pandas as pd
 import string
 import time
 import xarray as xr
-from memory_profiler import profile
+#from memory_profiler import profile
 
 from ._geoprocessing import analyze_filename_dem, \
                             classify_aspect, \
