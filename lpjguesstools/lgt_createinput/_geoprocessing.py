@@ -11,6 +11,7 @@ from rasterio.enums import Resampling
 from rasterio.mask import mask
 import scipy
 import xarray as xr
+from memory_profiler import profile
 
 from ._tpi import calculate_tpi
 from ._xr_tile import *
@@ -65,7 +66,7 @@ def calculate_utm_crs(lon, lat):
     code = 32700-int(np.round((45.0+lat)/90,0))*100+int(np.round((183.0+lon)/6,0))
     return 'EPSG:%d' % code    
 
-
+@profile
 def apply_mask(a, m):
     """Apply a mask from another masked_array."""
     return np.ma.masked_where(np.ma.getmask(m), a)
@@ -95,7 +96,7 @@ def derive_coordinates(info):
     # flipped lats
     return dict(lon=lons, lat=lats[::-1])
 
-
+@profile
 def create_tile(dem, dem_mask, slope, aspect, landform, info=None, source=None):
     """Create a tile dataset from dem, dem_mask, slope and aspect."""
     
@@ -168,7 +169,7 @@ def analyze_filename_shp(fname):
         source_name = os.path.basename(fname)
     return (fname, source_name)
 
-
+@profile
 def compute_spatial_dataset(fname_dem, fname_shp=None):
     """Take a GTiff file name and return a xarray datasets of dem, slope, 
     aspect and water mask layers."""
