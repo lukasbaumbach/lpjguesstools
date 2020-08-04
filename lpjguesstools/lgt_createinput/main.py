@@ -297,7 +297,7 @@ def create_stats_table(df, var):
     return df_[new_col_order]
 
 @profile
-@time_dec
+#@time_dec
 def convert_dem_files(cfg, lf_ele_levels):
     """Compute landform units based on elevation, slope, aspect and tpi classes."""
 
@@ -358,7 +358,7 @@ def convert_dem_files(cfg, lf_ele_levels):
                         log.debug("Empty tile %d in file %s ignored." % (i+1, dem_file))
 
 @profile
-@time_dec
+#@time_dec
 def compute_statistics(cfg):
     """Extract landform statistics from tiles in tilestore."""
     available_tiles = glob.glob(os.path.join(cfg.TILESTORE_PATH, '*.nc'))
@@ -514,7 +514,7 @@ def build_site_netcdf(soilref, elevref, extent=None):
     return dsout
 
 @profile
-@time_dec
+#@time_dec
 def build_landform_netcdf(lf_full_set, df_dict, cfg, elevation_levels, refnc=None):
     """Build landform netcdf based on refnc dims and datatables."""
 
