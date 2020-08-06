@@ -34,6 +34,7 @@ import pandas as pd
 import string
 import time
 import xarray as xr
+import objgraph
 
 from ._geoprocessing import analyze_filename_dem, \
                             classify_aspect, \
@@ -332,8 +333,13 @@ def convert_dem_files(cfg, lf_ele_levels):
 
                 shp_glob_string = os.path.join(cfg.WATERMASKSTORE_PATH, str_lon + str_lat + '*.shp')
                 matched_shp_file = match_watermask_shpfile(shp_glob_string.lower())
+                
+                objgraph.show_growth()
 
                 ds_srtm1 = compute_spatial_dataset(dem_file, fname_shp=matched_shp_file)
+                
+                objgraph.show_growth()
+                
                 tiles = split_srtm1_dataset(ds_srtm1)
 
                 for i, tile in enumerate(tiles):
