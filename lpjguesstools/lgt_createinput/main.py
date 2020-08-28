@@ -310,6 +310,8 @@ def convert_dem_files(cfg, lf_ele_levels):
         dem_files = sorted(glob.glob(glob_string))
 
         existing_tiles = tiles_already_processed(cfg.TILESTORE_PATH)
+        
+        pympl_tr = tracker.SummaryTracker()
 
         for dem_file in dem_files:
             fname = os.path.basename(dem_file)
@@ -336,6 +338,8 @@ def convert_dem_files(cfg, lf_ele_levels):
 
                 ds_srtm1 = compute_spatial_dataset(dem_file, fname_shp=matched_shp_file)
                 tiles = split_srtm1_dataset(ds_srtm1)
+                
+                pympl_tr.print_diff()
 
                 for i, tile in enumerate(tiles):
 
@@ -749,7 +753,6 @@ def main(cfg):
     lf_classes, lf_ele_levels = define_landform_classes(200, 6000, TYPE=cfg.CLASSIFICATION)
 
     # process dem files to tiles (if not already processed)
-    pympl_tr = tracker.SummaryTracker()
     convert_dem_files(cfg, lf_ele_levels)
 
     #sitenc = build_site_netcdf(SOIL_NC, ELEVATION_NC, extent=cfg.REGION)
