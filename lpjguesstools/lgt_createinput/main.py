@@ -34,6 +34,8 @@ import pandas as pd
 import string
 import time
 import xarray as xr
+import linecache
+import tracemalloc
 
 from ._geoprocessing import analyze_filename_dem, \
                             classify_aspect, \
@@ -50,6 +52,30 @@ log = logging.getLogger(__name__)
 # import constants
 from . import NODATA
 from . import ENCODING
+
+# define tracemalloc line function
+def display_top(snapshot, key_type='lineno', limit=10):
+    snapshot = snapshot.filter_traces((
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<unknown>"),
+    ))
+    top_stats = snapshot.statistics(key_type)
+
+    print("Top %s lines" % limit)
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        print("#%s: %s:%s: %.1f KiB"
+              % (index, frame.filename, frame.lineno, stat.size / 1024))
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            print('    %s' % line)
+
+    other = top_stats[limit:]
+    if other:
+        size = sum(stat.size for stat in other)
+        print("%s other: %.1f KiB" % (len(other), size / 1024))
+    total = sum(stat.size for stat in top_stats)
+    print("Total allocated size: %.1f KiB" % (total / 1024))
 
 # quick helpers
 # TODO: move to a dedicated file later
@@ -355,7 +381,10 @@ def convert_dem_files(cfg, lf_ele_levels):
                                                     format='NETCDF4_CLASSIC')
                     else:
                         log.debug("Empty tile %d in file %s ignored." % (i+1, dem_file))
-
+                        
+            # show tracemalloc snapshot
+            snapshot = tracemalloc.take_snapshot()
+            display_top(snapshot)
 
 @time_dec
 def compute_statistics(cfg):
@@ -743,6 +772,9 @@ def main(cfg):
     ELEVATION_NC = pkg_resources.resource_filename(__name__, '../data/GLOBAL_ELEVATION_05deg.nc')
 
     log.info("Converting DEM files and computing landform stats")
+    
+    # start tracemalloc
+    tracemalloc.start()
 
     # define the final landform classes (now with elevation brackets)
     lf_classes, lf_ele_levels = define_landform_classes(200, 6000, TYPE=cfg.CLASSIFICATION)
