@@ -34,6 +34,7 @@ import pandas as pd
 import string
 import time
 import xarray as xr
+from pympler import tracker
 
 from ._geoprocessing import analyze_filename_dem, \
                             classify_aspect, \
@@ -748,6 +749,7 @@ def main(cfg):
     lf_classes, lf_ele_levels = define_landform_classes(200, 6000, TYPE=cfg.CLASSIFICATION)
 
     # process dem files to tiles (if not already processed)
+    pympl_tr = tracker.SummaryTracker()
     convert_dem_files(cfg, lf_ele_levels)
 
     #sitenc = build_site_netcdf(SOIL_NC, ELEVATION_NC, extent=cfg.REGION)
